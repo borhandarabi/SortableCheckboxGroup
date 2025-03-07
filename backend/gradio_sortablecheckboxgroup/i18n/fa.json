@@ -1,0 +1,16 @@
+{
+  "sortablecheckboxgroup": {
+    "priority_order": "ترتیب اولویت",
+    "move_up": "انتقال به بالا",
+    "move_down": "انتقال به پایین",
+    "keyboard_usage_guide": "از کلیدهای جهت‌دار برای جابجایی، Enter یا Space برای انتخاب/لغو انتخاب و Escape برای لغو استفاده کنید",
+    "moving": "در حال جابجایی",
+    "keyboard_instructions": "راهنمای استفاده از صفحه کلید",
+    "arrow_keys_guide": "از کلیدهای جهت‌دار برای جابجایی آیتم‌ها استفاده کنید",
+    "enter_space_guide": "از کلیدهای Enter یا Space برای انتخاب و جابجایی آیتم‌ها استفاده کنید",
+    "escape_guide": "از کلید Escape برای لغو انتخاب استفاده کنید",
+    "sortable_items_list": "لیست آیتم‌های قابل مرتب‌سازی",
+    "show_order": "نمایش ترتیب اولویت",
+    "hide_order": "پنهان کردن ترتیب اولویت"
+  }
+} 

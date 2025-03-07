@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from collections.abc import Callable, Sequence
 from typing import TYPE_CHECKING, Any, Literal
+import os
+import json
 
 from gradio_client.documentation import document
 
@@ -30,6 +32,8 @@ class SortableCheckboxGroup(FormComponent):
         *,
         value: Sequence[str | float | int] | str | float | int | Callable | None = None,
         type: Literal["value", "index"] = "value",
+        sortable: bool = False,
+        show_order: bool = False,
         label: str | None = None,
         info: str | None = None,
         every: Timer | float | None = None,
@@ -50,6 +54,8 @@ class SortableCheckboxGroup(FormComponent):
             choices: A list of string or numeric options to select from. An option can also be a tuple of the form (name, value), where name is the displayed name of the checkbox button and value is the value to be passed to the function, or returned by the function.
             value: Default selected list of options. If a single choice is selected, it can be passed in as a string or numeric type. If a function is provided, the function will be called each time the app loads to set the initial value of this component.
             type: Type of value to be returned by component. "value" returns the list of strings of the choices selected, "index" returns the list of indices of the choices selected.
+            sortable: If True, allows reordering of selected items to set priority.
+            show_order: If True, shows the priority order section by default.
             label: the label for this component, displayed above the component if `show_label` is `True` and is also used as the header if there are a table of examples for this component. If None and used in a `gr.Interface`, the label will be the name of the parameter this component corresponds to.
             info: additional component description, appears below the label in smaller font. Supports markdown / HTML syntax.
             every: Continously calls `value` to recalculate it if `value` is a function (has no effect otherwise). Can provide a Timer whose tick resets `value`, or a float that provides the regular interval for the reset Timer.
@@ -78,6 +84,12 @@ class SortableCheckboxGroup(FormComponent):
                 f"Invalid value for parameter `type`: {type}. Please choose from one of: {valid_types}"
             )
         self.type = type
+        self.sortable = sortable
+        self.show_order = show_order
+        
+        # Load translations
+        self.translations = self._load_translations()
+        
         super().__init__(
             label=label,
             info=info,
@@ -95,6 +107,38 @@ class SortableCheckboxGroup(FormComponent):
             key=key,
             value=value,
         )
+
+    def _load_translations(self) -> dict:
+        """Load translations from i18n directory."""
+        translations = {}
+        i18n_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "i18n")
+        
+        if os.path.exists(i18n_dir):
+            for file in os.listdir(i18n_dir):
+                if file.endswith(".json"):
+                    lang_code = file.split(".")[0]
+                    with open(os.path.join(i18n_dir, file), "r", encoding="utf-8") as f:
+                        translations[lang_code] = json.load(f)
+        
+        return translations
+    
+    def get_translation(self, key: str, lang: str = "en") -> str:
+        """Get translation for key in specified language."""
+        if lang in self.translations and "sortablecheckboxgroup" in self.translations[lang]:
+            if key in self.translations[lang]["sortablecheckboxgroup"]:
+                return self.translations[lang]["sortablecheckboxgroup"][key]
+        
+        # Fallback to English
+        if "en" in self.translations and "sortablecheckboxgroup" in self.translations["en"]:
+            if key in self.translations["en"]["sortablecheckboxgroup"]:
+                return self.translations["en"]["sortablecheckboxgroup"][key]
+        
+        # Return the key as fallback
+        return key
+    
+    def get_block_name(self) -> str:
+        """Get component block name."""
+        return "sortablecheckboxgroup"
 
     def example_payload(self) -> Any:
         return [self.choices[0][1]] if self.choices else None
@@ -150,3 +194,18 @@ class SortableCheckboxGroup(FormComponent):
         if not isinstance(value, list):
             value = [value]
         return value
+
+    def get_config(self) -> dict[str, Any]:
+        """Return the configuration for this component."""
+        config = super().get_config()
+        config.update(
+            {
+                "choices": self.choices,
+                "value": self.value,
+                "type": self.type,
+                "sortable": self.sortable,
+                "show_order": self.show_order,
+                "translations": self.translations,  # Add translations to config
+            }
+        )
+        return config

@@ -22,12 +22,17 @@
     "./package.json": "./package.json"
   },
   "dependencies": {
-    "@gradio/atoms": "0.13.3",
+    "@gradio/atoms": "^0.13.3",
     "@gradio/statustracker": "0.10.4",
     "@gradio/utils": "0.10.1"
   },
   "devDependencies": {
-    "@gradio/preview": "0.13.0"
+    "@gradio/preview": "0.13.0",
+    "@sveltejs/vite-plugin-svelte": "^3.1.2",
+    "@tsconfig/svelte": "^5.0.4",
+    "svelte-check": "^3.5.0",
+    "typescript": "^5.8.2",
+    "vite": "^5.4.14"
   },
   "peerDependencies": {
     "svelte": "^4.0.0"

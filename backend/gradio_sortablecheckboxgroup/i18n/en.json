@@ -1,0 +1,16 @@
+{
+  "sortablecheckboxgroup": {
+    "priority_order": "Priority Order",
+    "move_up": "Move Up",
+    "move_down": "Move Down",
+    "keyboard_usage_guide": "Use arrow keys to move, Enter or Space to select/deselect, Escape to cancel",
+    "moving": "Currently moving",
+    "keyboard_instructions": "Keyboard instructions",
+    "arrow_keys_guide": "Use arrow keys to move items",
+    "enter_space_guide": "Use Enter or Space to select and move items",
+    "escape_guide": "Use Escape to cancel selection",
+    "sortable_items_list": "Sortable items list",
+    "show_order": "Show priority order",
+    "hide_order": "Hide priority order"
+  }
+} 
