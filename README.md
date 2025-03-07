@@ -12,18 +12,7 @@ app_file: space.py
 # `gradio_sortablecheckboxgroup`
 <img alt="Static Badge" src="https://img.shields.io/badge/version%20-%200.0.1%20-%20orange">  
 
-A customizable and accessible Gradio component that extends the standard CheckboxGroup with sorting capabilities.
-
-## Features
-
-- Drag and drop functionality for reordering selected items
-- Keyboard navigation support for accessibility
-- RTL (Right-to-Left) language support
-- Customizable styling and themes
-- Priority order visualization
-- Responsive design
-- Comprehensive keyboard shortcuts
-- ARIA attributes for accessibility
+SortableCheckboxGroup
 
 ## Installation
 
@@ -57,7 +46,7 @@ with gr.Blocks() as demo:
             sortable=True
         )
         
-        output = gr.Textbox(label="Result")
+        output = gr.Textbox(label="Result", value="Selected options with priority order: ['Option 1', 'Option 3']")
         
         def on_change(value):
             return f"Selected options with priority order: {value}"
@@ -75,28 +64,7 @@ with gr.Blocks() as demo:
 
 if __name__ == "__main__":
     demo.launch() 
-
-## Keyboard Controls
-
-The component supports comprehensive keyboard controls for accessibility:
-
-- **Arrow Keys (↑/↓)**: Move items up/down in the list
-- **Space**: Select/deselect an item for moving
-- **Enter**: Confirm item selection/movement
-- **Escape**: Cancel current selection/movement
-- **Tab**: Navigate through interactive elements
-
-## Recent Changes
-
-- Added comprehensive keyboard navigation support
-- Implemented RTL language support
-- Added priority order visualization with show/hide toggle
-- Improved accessibility with ARIA attributes
-- Added keyboard shortcuts guide
-- Enhanced drag and drop functionality
-- Added visual feedback for item movement
-- Implemented focus management for better UX
-- Added support for translations
+```
 
 ## `SortableCheckboxGroup`
 
