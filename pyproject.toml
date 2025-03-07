@@ -13,7 +13,7 @@ description = "SortableCheckboxGroup"
 readme = "README.md"
 license = "apache-2.0"
 requires-python = ">=3.10"
-authors = [{ name = "YOUR NAME", email = "YOUREMAIL@domain.com" }]
+authors = [{ name = "Borhan Darabi", email = "borhan.darabi@gmail.com" }]
 keywords = ["gradio-custom-component", "gradio-template-CheckboxGroup"]
 # Add dependencies here
 dependencies = ["gradio>=4.0,<6.0"]

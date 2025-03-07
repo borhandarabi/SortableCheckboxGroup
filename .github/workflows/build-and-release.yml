@@ -1,0 +1,121 @@
+name: Build and Release Component
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: main
+      
+      - name: Check for changes
+        uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            demo:
+              - 'demo/**'
+            css:
+              - 'demo/css.css'
+            space:
+              - 'demo/space.py'
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install gradio
+          pip install build twine
+      
+      - name: Extract Version
+        id: extract_version
+        run: |
+          # Get tag name from GitHub context
+          TAG_NAME="${{ github.event.release.tag_name }}"
+          # Remove 'v' prefix if present
+          VERSION=${TAG_NAME#v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Using version: $VERSION from release tag: $TAG_NAME"
+
+      - name: Build Component
+        id: build_component
+        run: |          
+          # Run install command
+          gradio cc install
+
+          # Run build command
+          gradio cc build
+          
+          echo "Building version ${{ steps.extract_version.outputs.version }}"
+      
+      - name: Commit changes
+        if: steps.changes.outputs.demo == 'true' || steps.changes.outputs.css == 'false' || steps.changes.outputs.space == 'false'
+        run: |
+          # Stage and commit changes
+          git add .
+          git commit -m "Build component for version ${{ steps.extract_version.outputs.version }}"
+          # Push changes
+          git push
+      
+      - name: Upload build artifacts to release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.event.release.tag_name }}
+          files: |
+            dist/*
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to PyPI and/or Hugging Face (Optional)
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+          PYPI_USERNAME: ${{ secrets.PYPI_USERNAME }}
+        if: ${{ env.HF_TOKEN != '' || (env.PYPI_USERNAME != '' && env.PYPI_PASSWORD != '') }}
+        run: |
+          # Check for HF_TOKEN
+          if [ -n "${{ env.HF_TOKEN }}" ]; then
+            echo "Publishing to Hugging Face..."
+            
+            # Check if PyPI credentials are available
+            if [ -n "${{ env.PYPI_USERNAME }}" ] && [ -n "${{ env.PYPI_PASSWORD }}" ]; then
+              echo "Publishing to PyPI and Hugging Face..."
+              gradio cc publish ${{ steps.extract_version.outputs.version }} \
+                --pypi-username ${{ env.PYPI_USERNAME }} \
+                --pypi-password ${{ env.PYPI_PASSWORD }} \
+                --upload-demo \
+                --hf-token ${{ env.HF_TOKEN }}
+            else
+              echo "Publishing to Hugging Face only..."
+              gradio cc publish ${{ steps.extract_version.outputs.version }} \
+                --no-upload-pypi \
+                --upload-demo \
+                --hf-token ${{ env.HF_TOKEN }}
+            fi
+          # Check for PyPI credentials only
+          elif [ -n "${{ env.PYPI_USERNAME }}" ] && [ -n "${{ env.PYPI_PASSWORD }}" ]; then
+            echo "Publishing to PyPI only..."
+            gradio cc publish ${{ steps.extract_version.outputs.version }} \
+              --pypi-username ${{ env.PYPI_USERNAME }} \
+              --pypi-password ${{ env.PYPI_PASSWORD }} \
+              --no-upload-demo
+          else
+            echo "No valid credentials found. Skipping publish step."
+            exit 0
+          fi 
